@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import User from '../models/user';
 import { NotFoundError, BadRequestError } from '../errors';
+import { HttpStatus } from '../constants';
 
 const USER_NOT_FOUND_ERROR = 'Запрашиваемый пользователь не найден';
 const BAD_REQUEST_ERROR = 'Необходимо заполнить все поля';
@@ -33,7 +34,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     }
 
     const user = await User.create({ name, about, avatar });
-    return res.json(user);
+    return res.status(HttpStatus.CREATED).json(user);
   } catch (error) {
     return next(error);
   }
@@ -55,7 +56,7 @@ export const updateUserProfile = async (req: Request, res: Response, next: NextF
       throw new NotFoundError(USER_NOT_FOUND_ERROR);
     }
 
-    return res.json(user);
+    return res.status(HttpStatus.OK).json(user);
   } catch (error) {
     return next(error);
   }
@@ -77,7 +78,7 @@ export const updateUserAvatar = async (req: Request, res: Response, next: NextFu
       throw new NotFoundError(USER_NOT_FOUND_ERROR);
     }
 
-    return res.json(user);
+    return res.status(HttpStatus.OK).json(user);
   } catch (error) {
     return next(error);
   }

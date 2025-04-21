@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import { NotFoundError, BadRequestError } from '../errors';
+import { HttpStatus } from '../constants';
 
 const USER_NOT_FOUND_ERROR = 'Необходима авторизация';
 const BAD_REQUEST_ERROR = 'Необходимо заполнить все поля';
@@ -31,7 +32,7 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
 
     // @ts-ignore
     const card = await Card.create({ name, link, owner: req.user._id });
-    res.status(201).json(card);
+    res.status(HttpStatus.CREATED).json(card);
   } catch (err) {
     if (err instanceof BadRequestError) {
       throw err;
@@ -48,7 +49,7 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
       throw new NotFoundError(CARD_NOT_FOUND_ERROR);
     }
 
-    res.status(200).json({ message: DELETE_CARD_RESPONSE });
+    res.status(HttpStatus.OK).json({ message: DELETE_CARD_RESPONSE });
   } catch (err) {
     if (err instanceof NotFoundError) {
       throw err;
