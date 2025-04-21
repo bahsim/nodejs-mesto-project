@@ -19,6 +19,7 @@ export enum ErrorMessages {
   CARD_NOT_FOUND_ERROR = 'Карточка не найдена',
   DELETE_CARD_RESPONSE = 'Карточка удалена',
   FORBIDDEN_ERROR = 'Вы не можете удалить эту карточку',
+  PAGE_NOT_FOUND_ERROR = 'Страница не найдена',
 }
 
 export const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
