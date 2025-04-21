@@ -1,12 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
-import { NotFoundError, BadRequestError } from '../errors';
-import { HttpStatus } from '../constants';
-
-const USER_NOT_FOUND_ERROR = 'Необходима авторизация';
-const BAD_REQUEST_ERROR = 'Необходимо заполнить все поля';
-const CARD_NOT_FOUND_ERROR = 'Карточка не найдена';
-const DELETE_CARD_RESPONSE = 'Карточка удалена';
+import { NotFoundError, BadRequestError, ForbiddenError } from '../errors';
+import { ErrorMessages, HttpStatus } from '../constants';
 
 export const getCards = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,12 +17,12 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
     const { name, link } = req.body;
 
     if (!name || !link) {
-      throw new BadRequestError(BAD_REQUEST_ERROR);
+      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
     }
 
     // @ts-ignore
     if (!req.user) {
-      throw new BadRequestError(USER_NOT_FOUND_ERROR);
+      throw new BadRequestError(ErrorMessages.UNAUTHORIZED_ERROR);
     }
 
     // @ts-ignore
@@ -43,13 +38,26 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const card = await Card.findByIdAndDelete(req.params.cardId);
+    const { cardId } = req.params;
 
-    if (!card) {
-      throw new NotFoundError(CARD_NOT_FOUND_ERROR);
+    if (!cardId) {
+      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
     }
 
-    res.status(HttpStatus.OK).json({ message: DELETE_CARD_RESPONSE });
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      throw new NotFoundError(ErrorMessages.CARD_NOT_FOUND_ERROR);
+    }
+
+    // @ts-ignore
+    if (card.owner.toString() !== req.user._id) {
+      throw new ForbiddenError(ErrorMessages.FORBIDDEN_ERROR);
+    }
+
+    await card.deleteOne();
+
+    res.status(HttpStatus.OK).json({ message: ErrorMessages.DELETE_CARD_RESPONSE });
   } catch (err) {
     if (err instanceof NotFoundError) {
       throw err;
@@ -63,7 +71,7 @@ export const putLike = async (req: Request, res: Response, next: NextFunction) =
     const { cardId } = req.params;
 
     if (!cardId) {
-      throw new BadRequestError(BAD_REQUEST_ERROR);
+      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
     }
 
     // @ts-ignore
@@ -71,7 +79,7 @@ export const putLike = async (req: Request, res: Response, next: NextFunction) =
     const card = await Card.findByIdAndUpdate(cardId, { $addToSet: { likes: _id } }, { new: true });
 
     if (!card) {
-      throw new NotFoundError(CARD_NOT_FOUND_ERROR);
+      throw new NotFoundError(ErrorMessages.CARD_NOT_FOUND_ERROR);
     }
 
     res.json(card);
@@ -88,7 +96,7 @@ export const deleteLike = async (req: Request, res: Response, next: NextFunction
     const { cardId } = req.params;
 
     if (!cardId) {
-      throw new BadRequestError(BAD_REQUEST_ERROR);
+      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
     }
 
     // @ts-ignore
@@ -96,7 +104,7 @@ export const deleteLike = async (req: Request, res: Response, next: NextFunction
     const card = await Card.findByIdAndUpdate(cardId, { $pull: { likes: _id } }, { new: true });
 
     if (!card) {
-      throw new NotFoundError(CARD_NOT_FOUND_ERROR);
+      throw new NotFoundError(ErrorMessages.CARD_NOT_FOUND_ERROR);
     }
 
     res.json(card);

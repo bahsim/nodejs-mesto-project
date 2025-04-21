@@ -1,11 +1,17 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import router from './routes/index';
+import cookieParser from 'cookie-parser';
+import routes from './routes/index';
+import { requestLogger } from './middlewares/request-logger';
+import { errorHandler } from './middlewares/error-handler';
 
 const app = express();
 
+app.use(requestLogger);
 app.use(express.json());
-app.use(router);
+app.use(cookieParser());
+app.use(routes);
+app.use(errorHandler);
 
 mongoose.connect('mongodb://localhost:27017/mestodb')
   .then(() => {
