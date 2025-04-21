@@ -1,23 +1,20 @@
-import {
-  Router, Request, Response, NextFunction,
-} from 'express';
+import { Router } from 'express';
+import { auth } from '../middlewares/auth';
 import userRouter from './user';
 import cardRouter from './card';
-import { errorHandler } from '../middlewares/error-handler';
+import { login, logout, createUser } from '../controllers/user';
+import { validateCreateUser, validateLogin } from '../middlewares/validators';
 
 const router = Router();
 
-router.use((req: Request, res: Response, next: NextFunction) => {
-  // @ts-ignore
-  req.user = {
-    _id: '68035871ec0fe55b8498687c',
-  };
-  next();
-});
+// Public routes
+router.post('/users/signup', validateCreateUser, createUser);
+router.post('/users/signin', validateLogin, login);
+router.post('/users/signout', logout);
 
-router.use(userRouter);
-router.use(cardRouter);
-
-router.use(errorHandler);
+// Protected routes
+router.use(auth);
+router.use('/users', userRouter);
+router.use('/cards', cardRouter);
 
 export default router;

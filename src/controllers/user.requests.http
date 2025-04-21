@@ -8,16 +8,36 @@ GET http://localhost:3000/users/68035871ec0fe55b8498687c
 
 ###
 
-# Create a user
+# Signup
 
-POST http://localhost:3000/users
+POST http://localhost:3000/users/signup
 Content-Type: application/json
 
 {
   "name": "John Doe",
   "about": "I am a software engineer",
-  "avatar": "https://example.com/avatar.png"
+  "avatar": "https://example.com/avatar.png",
+  "email": "test@test.com",
+  "password": "password"
 }
+
+###
+
+# Signin
+
+POST http://localhost:3000/users/signin
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "password"
+}
+
+###
+
+# Signout
+
+POST http://localhost:3000/users/signout
 
 ###
 
@@ -41,3 +61,5 @@ Content-Type: application/json
 {
   "avatar": "https://example.com/avatar.png"
 }
+
+###
