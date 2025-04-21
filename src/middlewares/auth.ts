@@ -17,6 +17,6 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
 
     return next();
   } catch (error) {
-    return next(error);
+    return next(new UnauthorizedError());
   }
 };

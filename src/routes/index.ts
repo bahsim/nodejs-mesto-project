@@ -4,6 +4,8 @@ import userRouter from './user';
 import cardRouter from './card';
 import { login, logout, createUser } from '../controllers/user';
 import { validateCreateUser, validateLogin } from '../middlewares/validators';
+import { NotFoundError } from '../errors';
+import { ErrorMessages } from '../constants';
 
 const router = Router();
 
@@ -16,5 +18,9 @@ router.post('/users/signout', logout);
 router.use(auth);
 router.use('/users', userRouter);
 router.use('/cards', cardRouter);
+
+router.use('*', (req, res, next) => {
+  next(new NotFoundError(ErrorMessages.PAGE_NOT_FOUND_ERROR));
+});
 
 export default router;
