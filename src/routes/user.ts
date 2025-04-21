@@ -15,8 +15,8 @@ import {
 const router = Router();
 
 router.get('/', findUsers);
-router.get('/:userId', validateUserId, findUser);
 router.get('/me', getCurrentUser);
+router.get('/:userId', validateUserId, findUser);
 router.patch('/me', validateUpdateUser, updateUserProfile);
 router.patch('/me/avatar', validateUpdateAvatar, updateUserAvatar);
 

@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
-import { NotFoundError, BadRequestError, ForbiddenError } from '../errors';
+import { NotFoundError, ForbiddenError } from '../errors';
 import { ErrorMessages, HttpStatus } from '../constants';
 
 export const getCards = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cards = await Card.find();
     res.json(cards);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -16,33 +16,18 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
   try {
     const { name, link } = req.body;
 
-    if (!name || !link) {
-      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
-    }
-
-    // @ts-ignore
-    if (!req.user) {
-      throw new BadRequestError(ErrorMessages.UNAUTHORIZED_ERROR);
-    }
-
     // @ts-ignore
     const card = await Card.create({ name, link, owner: req.user._id });
+
     res.status(HttpStatus.CREATED).json(card);
-  } catch (err) {
-    if (err instanceof BadRequestError) {
-      throw err;
-    }
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { cardId } = req.params;
-
-    if (!cardId) {
-      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
-    }
 
     const card = await Card.findById(cardId);
 
@@ -58,21 +43,14 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
     await card.deleteOne();
 
     res.status(HttpStatus.OK).json({ message: ErrorMessages.DELETE_CARD_RESPONSE });
-  } catch (err) {
-    if (err instanceof NotFoundError) {
-      throw err;
-    }
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
 export const putLike = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { cardId } = req.params;
-
-    if (!cardId) {
-      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
-    }
 
     // @ts-ignore
     const { _id } = req.user;
@@ -83,21 +61,14 @@ export const putLike = async (req: Request, res: Response, next: NextFunction) =
     }
 
     res.json(card);
-  } catch (err) {
-    if (err instanceof NotFoundError) {
-      throw err;
-    }
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
 export const deleteLike = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { cardId } = req.params;
-
-    if (!cardId) {
-      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
-    }
 
     // @ts-ignore
     const { _id } = req.user;
@@ -108,10 +79,7 @@ export const deleteLike = async (req: Request, res: Response, next: NextFunction
     }
 
     res.json(card);
-  } catch (err) {
-    if (err instanceof NotFoundError) {
-      throw err;
-    }
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };

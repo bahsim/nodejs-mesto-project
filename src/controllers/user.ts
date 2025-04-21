@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import User from '../models/user';
 import {
-  NotFoundError, BadRequestError, UnauthorizedError, ConflictError,
+  NotFoundError, UnauthorizedError, ConflictError,
 } from '../errors';
 import { HttpStatus, JWT_SECRET, ErrorMessages } from '../constants';
 
@@ -32,10 +32,6 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       name, about, avatar, email, password,
     } = req.body;
 
-    if (!name || !about || !avatar || !email || !password) {
-      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
-    }
-
     const hash = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -58,10 +54,6 @@ export const updateUserProfile = async (req: Request, res: Response, next: NextF
     const { _id } = req.user;
     const { name, about } = req.body;
 
-    if (!name || !about) {
-      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
-    }
-
     const user = await User.findByIdAndUpdate(_id, { name, about }, { new: true });
 
     if (!user) {
@@ -79,10 +71,6 @@ export const updateUserAvatar = async (req: Request, res: Response, next: NextFu
     // @ts-ignore
     const { _id } = req.user;
     const { avatar } = req.body;
-
-    if (!avatar) {
-      throw new BadRequestError(ErrorMessages.BAD_REQUEST_ERROR);
-    }
 
     const user = await User.findByIdAndUpdate(_id, { avatar }, { new: true });
 
