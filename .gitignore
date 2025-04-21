@@ -13,6 +13,10 @@ node_modules
 .DS_Store
 .idea
 .vscode
+.cursor
 
 # Typescript build
 dist
+
+# Environment variables
+.env
